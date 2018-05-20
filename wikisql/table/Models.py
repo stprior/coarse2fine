@@ -236,9 +236,9 @@ class CondDecoder(nn.Module):
         state.update_state(hidden)
 
         # Concatenates sequence of tensors along a new dimension.
-        outputs = torch.stack([outputs])
+        outputs = torch.stack(outputs)
         for k in attns:
-            attns[k] = torch.stack([attns[k]])
+            attns[k] = torch.stack(attns[k])
 
         return outputs, state, attns
 
