@@ -10,7 +10,7 @@ import table.Models
 import table.modules
 from table.IO import TableDataset
 from table.Models import ParserModel, RNNEncoder, CondDecoder, TableRNNEncoder, MatchScorer, CondMatchScorer, CoAttention
-from lib.query import agg_ops, cond_ops
+from lib.query import Query 
 import torchtext.vocab
 from table.modules.Embeddings import PartUpdateEmbedding
 
@@ -99,7 +99,7 @@ def make_base_model(model_opt, fields, checkpoint=None):
 
     agg_classifier = nn.Sequential(
         nn.Dropout(model_opt.dropout),
-        nn.Linear(model_opt.rnn_size, len(agg_ops)),
+        nn.Linear(model_opt.rnn_size, len(Query.agg_ops)),
         nn.LogSoftmax())
     sel_match = MatchScorer(2 * model_opt.rnn_size,
                             model_opt.score_size, model_opt.dropout)

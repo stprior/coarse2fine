@@ -1,5 +1,5 @@
 import os
-from path import Path
+from path import path
 import torch
 import random
 import numpy as np
