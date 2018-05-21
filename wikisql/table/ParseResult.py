@@ -50,6 +50,10 @@ class ParseResult(object):
         if all((self.correct[it] == 1 for it in ('agg', 'sel', 'where'))):
             self.correct['all'] = 1
 
+        # print('Q')
+        # print(q)
+        # print('executing...')
+        # print(Query.from_dict(sql_gold))
         # execution
         table_id = gold['table_id']
         ans_gold = engine.execute_query(
@@ -62,6 +66,10 @@ class ParseResult(object):
             ans_pred = repr(e)
         if set(ans_gold) == set(ans_pred):
             self.correct['exe'] = 1
+
+    def predict(self, gold):
+        sql_pred = {'agg':self.agg, 'sel':self.sel, 'conds': self.recover_cond_to_gloss(gold)}
+        return Query.from_dict(sql_pred)
 
     def recover_cond_to_gloss(self, gold):
         r_list = []

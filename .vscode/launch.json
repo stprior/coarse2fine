@@ -5,6 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "coarse2fine",
+      "type": "python",
+      "request": "launch",
+      "cwd": "/home/stevop/repos/coarse2fine/wikisql",
+      "program": "/home/stevop/repos/coarse2fine/wikisql/predict.py",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "args": ["-split","pred","-output","pred.txt","-data_path","/home/stevop/repos/coarse2fine/data_model/wikisql","-model_path","/home/stevop/repos/coarse2fine/data_model/wikisql/pretrain.pt"]
+    },
+    {
       "name": "Python: Current File",
       "type": "python",
       "request": "launch",
