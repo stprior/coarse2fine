@@ -48,8 +48,8 @@ def main():
 
         translator = table.Translator(opt, dummy_opt.__dict__)
         data = table.IO.TableDataset(js_list, translator.fields, None, False)
-        test_data = table.IO.OrderedIterator(
-            dataset=data, device=opt.gpu, batch_size=opt.batch_size, train=False, sort=True, sort_within_batch=False)
+        test_data = table.IO.OrderedIterator(dataset=data,
+            device=opt.gpu, batch_size=opt.batch_size, train=False, sort=True, sort_within_batch=False)
 
         # inference
         r_list = []

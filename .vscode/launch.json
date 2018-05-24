@@ -11,7 +11,8 @@
       "cwd": "/home/stevop/repos/coarse2fine/wikisql",
       "program": "/home/stevop/repos/coarse2fine/wikisql/predict.py",
       "env": {
-        "CUDA_VISIBLE_DEVICES": "0"
+        "CUDA_VISIBLE_DEVICES": "0",
+        "PYTHONPATH": "/home/stevop/repos/WikiSQL/"
       },
       "args": ["-split","pred","-output","pred.txt","-data_path","/home/stevop/repos/coarse2fine/data_model/wikisql","-model_path","/home/stevop/repos/coarse2fine/data_model/wikisql/pretrain.pt"]
     },
