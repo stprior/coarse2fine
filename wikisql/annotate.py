@@ -7,45 +7,56 @@ from stanza.nlp.corenlp import CoreNLPClient
 from tqdm import tqdm
 import copy
 from lib.common import count_lines, detokenize
-from lib.query import Query, agg_ops, cond_ops
+from lib.query import Query
 
 
 client = None
 
 
-def annotate(sentence, lower=True):
+def annotate(sentence, lower=True, include_pos=False):
     global client
     if client is None:
-        client = CoreNLPClient(default_annotators='ssplit,tokenize'.split(','))
-    words, gloss, after = [], [], []
+        annotators = 'ssplit,tokenize'
+        if include_pos: annotators = annotators + ',pos'
+        client = CoreNLPClient(default_annotators=annotators.split(','))
+    words, gloss, after, pos = [], [], [], []
     for s in client.annotate(sentence):
         for t in s:
             words.append(t.word)
             gloss.append(t.originalText)
             after.append(t.after)
+            if include_pos: pos.append(t.pos)
     if lower:
         words = [w.lower() for w in words]
-    return {
-        'gloss': gloss,
+    if include_pos: return {        
         'words': words,
         'after': after,
+        'ent': pos,
+        'gloss': gloss,        
+    }
+    return {        
+        'words': words,
+        'after': after,
+        'gloss': gloss,        
     }
 
 
 def annotate_example(example, table):
-    ann = {'table_id': example['table_id']}
-    ann['question'] = annotate(example['question'])
-    ann['table'] = {
-        'header': [annotate(h) for h in table['header']],
+    ann = {
+        'table_id': example['table_id'],
+        'question': annotate(example['question'], include_pos=True),
+        'table': {
+            'header': [annotate(h) for h in table['header']],
+        }
     }
     ann['query'] = sql = copy.deepcopy(example['sql'])
     for c in ann['query']['conds']:
         c[-1] = annotate(str(c[-1]))
 
     q1 = 'SYMSELECT SYMAGG {} SYMCOL {}'.format(
-        agg_ops[sql['agg']], table['header'][sql['sel']])
+        Query.agg_ops[sql['agg']], table['header'][sql['sel']])
     q2 = ['SYMCOL {} SYMOP {} SYMCOND {}'.format(
-        table['header'][col], cond_ops[op], detokenize(cond)) for col, op, cond in sql['conds']]
+        table['header'][col], Query.cond_ops[op], detokenize(cond)) for col, op, cond in sql['conds']]
     if q2:
         q2 = 'SYMWHERE ' + ' SYMAND '.join(q2) + ' SYMEND'
     else:
@@ -54,8 +65,8 @@ def annotate_example(example, table):
         syms=' '.join(['SYM' + s for s in Query.syms]),
         table=' '.join(['SYMCOL ' + s for s in table['header']]),
         question=example['question'],
-        aggops=' '.join([s for s in agg_ops]),
-        condops=' '.join([s for s in cond_ops]),
+        aggops=' '.join([s for s in Query.agg_ops]),
+        condops=' '.join([s for s in Query.cond_ops]),
     )
     ann['seq_input'] = annotate(inp)
     out = '{q1} {q2}'.format(q1=q1, q2=q2) if q2 else q1
@@ -91,15 +102,15 @@ def is_valid_example(e):
 if __name__ == '__main__':
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--din', default='', help='data directory')
+        '--din', default='data_model/wikisql/data', help='data directory')
     parser.add_argument(
-        '--dout', default='', help='output directory')
+        '--dout', default='data_model/wikisql/annotated_ent', help='output directory')
     args = parser.parse_args()
 
     if not os.path.isdir(args.dout):
         os.makedirs(args.dout)
 
-    for split in ['train', 'dev', 'test']:
+    for split in ['predict']:
         fsplit = os.path.join(args.din, split) + '.jsonl'
         ftable = os.path.join(args.din, split) + '.tables.jsonl'
         fout = os.path.join(args.dout, split) + '.jsonl'
@@ -115,7 +126,11 @@ if __name__ == '__main__':
             n_written = 0
             for line in tqdm(fs, total=count_lines(fsplit)):
                 d = json.loads(line)
-                a = annotate_example(d, tables[d['table_id']])
+                try:
+                    a = annotate_example(d, tables[d['table_id']])
+                except IndexError:
+                    print("Table {} not found".format(d['table_id']))
+                    raise
                 if not is_valid_example(a):
                     raise Exception(str(a))
 

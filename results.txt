@@ -1,0 +1,4 @@
+what was the first season of the club who last won a title in 2012 ?,SELECT  col6 FROM table WHERE col3 = 2012
+which player has a total of 9 , and an opposition of offaly ?,SELECT  col1 FROM table WHERE col4 = 9 AND col5 = offaly
+who played in the 1987 all ireland,SELECT  col1 FROM table WHERE col2 = ireland AND col2 = ireland
+how many customers are single and under 18 years,SELECT COUNT col3 FROM table WHERE col1 = single AND col4 < 18

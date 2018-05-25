@@ -3,7 +3,8 @@ tensorboard_logger==0.0.4
 records==0.5.2
 more_itertools==3.2.0
 torchtext==0.2.0
-torch==0.2.0.post3
+#couldn't find torch.0.2.0 with pip - used anaconda instead
+#torch==0.2.0.post3
 six==1.11.0
 Babel==2.5.1
 tabulate==0.8.1
