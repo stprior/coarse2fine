@@ -14,7 +14,7 @@ try:
     from itertools import zip_longest
 except ImportError:
     from itertools import izip_longest as zip_longest
-from path import Path
+from path import path
 import glob
 import json
 from tqdm import tqdm

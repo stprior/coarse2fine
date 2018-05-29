@@ -50,6 +50,10 @@ class ParseResult(object):
         if all((self.correct[it] == 1 for it in ('agg', 'sel', 'where'))):
             self.correct['all'] = 1
 
+        # print('Q')
+        # print(q)
+        # print('executing...')
+        # print(Query.from_dict(sql_gold))
         # execution
         table_id = gold['table_id']
         ans_gold = engine.execute_query(
