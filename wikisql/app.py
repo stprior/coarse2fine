@@ -36,28 +36,6 @@ def annotated_question():
     sql_text = str.format("{}\n",pred.predict(question_json))
     return sql_text
 
-@app.route("/questions", methods=['POST'])
-def plain_question():
-    question_json = request.get_json()    
-    js_list = [question_json]
-
-    data = table.IO.TableDataset(js_list, translator.fields, None, False)
-    test_data = table.IO.OrderedIterator(dataset=data,
-        device=opt.gpu, batch_size=opt.batch_size, train=False, sort=True, sort_within_batch=False)
-
-    # inference
-    r_list = []
-    for batch in test_data:
-        r_list += translator.translate(batch)
-    r_list.sort(key=lambda x: x.idx)
-    assert len(r_list) == len(js_list), 'len(r_list) != len(js_list): {} != {}'.format(
-        len(r_list), len(js_list))
-
-    # output
-    pred = r_list[0]
-    sql_text = str.format("{}\n",pred.predict(question_json))
-    return sql_text
-
 #want to show known tables
 if __name__ == '__main__':
     app.run()

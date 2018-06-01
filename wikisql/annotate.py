@@ -7,7 +7,7 @@ from stanza.nlp.corenlp import CoreNLPClient
 from tqdm import tqdm
 import copy
 from lib.common import count_lines, detokenize
-from lib.query import Query
+from lib.query import Query, agg_ops, cond_ops
 
 
 client = None
