@@ -54,9 +54,9 @@ def annotate_example(example, table):
         c[-1] = annotate(str(c[-1]))
 
     q1 = 'SYMSELECT SYMAGG {} SYMCOL {}'.format(
-        Query.agg_ops[sql['agg']], table['header'][sql['sel']])
+        agg_ops[sql['agg']], table['header'][sql['sel']])
     q2 = ['SYMCOL {} SYMOP {} SYMCOND {}'.format(
-        table['header'][col], Query.cond_ops[op], detokenize(cond)) for col, op, cond in sql['conds']]
+        table['header'][col], cond_ops[op], detokenize(cond)) for col, op, cond in sql['conds']]
     if q2:
         q2 = 'SYMWHERE ' + ' SYMAND '.join(q2) + ' SYMEND'
     else:
@@ -65,8 +65,8 @@ def annotate_example(example, table):
         syms=' '.join(['SYM' + s for s in Query.syms]),
         table=' '.join(['SYMCOL ' + s for s in table['header']]),
         question=example['question'],
-        aggops=' '.join([s for s in Query.agg_ops]),
-        condops=' '.join([s for s in Query.cond_ops]),
+        aggops=' '.join([s for s in agg_ops]),
+        condops=' '.join([s for s in cond_ops]),
     )
     ann['seq_input'] = annotate(inp)
     out = '{q1} {q2}'.format(q1=q1, q2=q2) if q2 else q1
