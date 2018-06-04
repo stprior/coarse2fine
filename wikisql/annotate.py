@@ -13,41 +13,30 @@ from lib.query import Query, agg_ops, cond_ops
 client = None
 
 
-def annotate(sentence, lower=True, include_pos=False):
+def annotate(sentence, lower=True):
     global client
     if client is None:
-        annotators = 'ssplit,tokenize'
-        if include_pos: annotators = annotators + ',pos'
-        client = CoreNLPClient(default_annotators=annotators.split(','))
-    words, gloss, after, pos = [], [], [], []
+        client = CoreNLPClient(default_annotators='ssplit,tokenize'.split(','))
+    words, gloss, after = [], [], []
     for s in client.annotate(sentence):
         for t in s:
             words.append(t.word)
             gloss.append(t.originalText)
             after.append(t.after)
-            if include_pos: pos.append(t.pos)
     if lower:
         words = [w.lower() for w in words]
-    if include_pos: return {        
+    return {
+        'gloss': gloss,
         'words': words,
         'after': after,
-        'ent': pos,
-        'gloss': gloss,        
-    }
-    return {        
-        'words': words,
-        'after': after,
-        'gloss': gloss,        
     }
 
 
 def annotate_example(example, table):
-    ann = {
-        'table_id': example['table_id'],
-        'question': annotate(example['question'], include_pos=True),
-        'table': {
-            'header': [annotate(h) for h in table['header']],
-        }
+    ann = {'table_id': example['table_id']}
+    ann['question'] = annotate(example['question'])
+    ann['table'] = {
+        'header': [annotate(h) for h in table['header']],
     }
     ann['query'] = sql = copy.deepcopy(example['sql'])
     for c in ann['query']['conds']:
@@ -102,15 +91,15 @@ def is_valid_example(e):
 if __name__ == '__main__':
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--din', default='data_model/wikisql/data', help='data directory')
+        '--din', default='', help='data directory')
     parser.add_argument(
-        '--dout', default='data_model/wikisql/annotated_ent', help='output directory')
+        '--dout', default='', help='output directory')
     args = parser.parse_args()
 
     if not os.path.isdir(args.dout):
         os.makedirs(args.dout)
 
-    for split in ['predict']:
+    for split in ['train', 'dev', 'test']:
         fsplit = os.path.join(args.din, split) + '.jsonl'
         ftable = os.path.join(args.din, split) + '.tables.jsonl'
         fout = os.path.join(args.dout, split) + '.jsonl'
@@ -126,11 +115,7 @@ if __name__ == '__main__':
             n_written = 0
             for line in tqdm(fs, total=count_lines(fsplit)):
                 d = json.loads(line)
-                try:
-                    a = annotate_example(d, tables[d['table_id']])
-                except IndexError:
-                    print("Table {} not found".format(d['table_id']))
-                    raise
+                a = annotate_example(d, tables[d['table_id']])
                 if not is_valid_example(a):
                     raise Exception(str(a))
 
