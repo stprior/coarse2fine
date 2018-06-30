@@ -38,7 +38,7 @@ def argmax(scores):
 
 
 def add_pad(b_list, pad_index, return_tensor=True):
-    max_len = max((len(b) for b in b_list))
+    max_len = max(1, max((len(b) for b in b_list)))
     r_list = []
     for b in b_list:
         r_list.append(b + [pad_index] * (max_len - len(b)))
