@@ -28,8 +28,9 @@ class RootQuery(graphene.ObjectType):
         return [parse_jsonl(jsonline) for jsonline in js_list if jsonline.id == id]
 
 def build_schema(data_path):
+    global js_list
     table_path = os.path.join(data_path,'test.tables.jsonl')
     with codecs.open(table_path, "r", "utf-8") as corpus_file:
-        global js_list = [json.loads(line) for line in corpus_file]
+        js_list = [json.loads(line) for line in corpus_file]
     return RootQuery
 

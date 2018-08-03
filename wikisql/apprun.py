@@ -23,7 +23,7 @@ from lib.query import Query
 
 parser = argparse.ArgumentParser(description='evaluate.py')
 opts.translate_opts(parser)
-opt = parser.parse_args()
+opt = parser.parse_args(['-data_path','/home/stevop/repos/coarse2fine/data_model/wikisql','-model_path','/home/stevop/repos/coarse2fine/data_model/wikisql/pretrain.pt'])
 torch.cuda.set_device(opt.gpu)
 opt.anno = os.path.join(
     opt.data_path, 'annotated_ent/{}.jsonl'.format(opt.split))
