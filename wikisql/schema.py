@@ -14,16 +14,17 @@ class WikiSqlTable(graphene.ObjectType):
         return [['1','a','a'],['2','b','b']]
 
 def parse_jsonl(json_table_desc):
-    return WikiSqlTable(id = json_table_desc.id,
-        header = json_table_desc.header,
-        rows = json_table_desc.rows)
+    return WikiSqlTable(id = json_table_desc['id'],
+        header = json_table_desc['header'],
+        rows = json_table_desc['rows'])
 
 class RootQuery(graphene.ObjectType):
-    tables = graphene.List(WikiSqlTable)
+    tables = graphene.List(WikiSqlTable, id=graphene.Argument(graphene.String))
 
     def resolve_tables(self, info, id=None):
         if id is None:
-            return [parse_jsonl(jsonline) for jsonline in js_list]
+            tables = [parse_jsonl(jsonline) for jsonline in js_list[1:10]]
+            return tables
 
         return [parse_jsonl(jsonline) for jsonline in js_list if jsonline.id == id]
 
