@@ -31,13 +31,30 @@ def annotate(sentence, lower=True):
         'after': after,
     }
 
+def load_tables(ftable):
+    print('loading tables')
+    with open(ftable) as ft:
+        tables = {}
+        for line in tqdm(ft, total=count_lines(ftable)):
+            d = json.loads(line)
+            tables[d['id']] = d
+    return tables
+
 
 def annotate_example(example, table):
+    ann = annotate_question(example, table)
+    annotate_sql(ann, example, table)
+    return ann
+
+def annotate_question(example, table):
     ann = {'table_id': example['table_id']}
     ann['question'] = annotate(example['question'])
     ann['table'] = {
         'header': [annotate(h) for h in table['header']],
     }
+    return ann
+
+def annotate_sql(ann, example, table):
     ann['query'] = sql = copy.deepcopy(example['sql'])
     for c in ann['query']['conds']:
         c[-1] = annotate(str(c[-1]))
@@ -105,12 +122,9 @@ if __name__ == '__main__':
         fout = os.path.join(args.dout, split) + '.jsonl'
 
         print('annotating {}'.format(fsplit))
-        with open(fsplit) as fs, open(ftable) as ft, open(fout, 'wt') as fo:
-            print('loading tables')
-            tables = {}
-            for line in tqdm(ft, total=count_lines(ftable)):
-                d = json.loads(line)
-                tables[d['id']] = d
+        with open(fsplit) as fs, open(fout, 'wt') as fo:
+            tables = load_tables(ftable)
+            
             print('loading examples')
             n_written = 0
             for line in tqdm(fs, total=count_lines(fsplit)):
