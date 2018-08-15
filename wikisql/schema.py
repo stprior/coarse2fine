@@ -9,7 +9,7 @@ js_lookup = {}
 
 
 class WikiSqlTable(graphene.ObjectType):
-    id = graphene.ID()
+    id = graphene.String()
     tablename = graphene.String()
     header = graphene.List(graphene.String)
     rows = graphene.List(graphene.List(graphene.String))
@@ -35,7 +35,7 @@ class RootQuery(graphene.ObjectType):
 
 class AskQuestion(graphene.Mutation):
     class Arguments:
-        table_id = graphene.ID()
+        table_id = graphene.String()
         question_text = graphene.String()
     sql = graphene.String()
 
@@ -44,7 +44,7 @@ class AskQuestion(graphene.Mutation):
         return AskQuestion(sql=sql)
 
 class RootMutations(graphene.ObjectType):
-    ask_question = graphene.Field(AskQuestion)
+    ask_question = AskQuestion.Field()
 
 
 def save_table(json_line):

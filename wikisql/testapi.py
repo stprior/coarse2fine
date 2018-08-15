@@ -1,12 +1,14 @@
 import unittest
 from schema import build_schema
 import graphene
-#test schema without mutations ...
-class TestSchema(unittest.TestCase):
+import engine
+
+#end to end test
+class TestApi(unittest.TestCase):
   def setUp(self):
     (rootQueryClass,mutationsClass) = build_schema('/home/stevop/repos/coarse2fine/data_model/wikisql/data')
     self.schema = graphene.Schema(query=rootQueryClass, mutation=mutationsClass)
-    #need to init a fake engine
+    engine.init('/home/stevop/repos/coarse2fine/data_model/wikisql')
     
   def test_query(self):
     result = self.schema.execute("""mutation m {
@@ -15,8 +17,8 @@ class TestSchema(unittest.TestCase):
         sql
     }
 }""")
-    print(result.data['sql'])
-    self.assertEqual('SELECT  col4 FROM table WHERE col5 = Brad', result.data['sql'])
+    print(result.data['askQuestion']['sql'])
+    self.assertEqual('SELECT  col4 FROM table WHERE col5 = Brad', result.data['askQuestion']['sql'])
 
 if __name__ == '__main__':
     unittest.main()
