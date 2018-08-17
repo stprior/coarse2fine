@@ -54,8 +54,8 @@ def save_table(json_line):
     
 def build_schema(data_path):
     global js_list
-    table_path = os.path.join(data_path,'test.tables.jsonl')
+    table_path = os.path.join(data_path,'dev.tables.jsonl')
     with codecs.open(table_path, "r", "utf-8") as corpus_file:
-        js_list = [json.loads(line) for line in corpus_file]
+        js_list = [save_table(line) for line in corpus_file]
     return (RootQuery, RootMutations)
 
