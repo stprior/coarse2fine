@@ -14,8 +14,6 @@ class WikiSqlTable(graphene.ObjectType):
     header = graphene.List(graphene.String)
     rows = graphene.List(graphene.List(graphene.String))
 
-    def resolve_rows(self, info):
-        return [['1','a','a'],['2','b','b']]
 
 def make_wikisqltable(json_table_desc):
     return WikiSqlTable(id = json_table_desc['id'],
